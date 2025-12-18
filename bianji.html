@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑客户</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        .edit-customer-modal {
+            width: 600px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+        .modal-header {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-btn {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+        }
+        .auto-nav-btn {
+            width: 80px;
+            height: 24px;
+            font-size: 11px;
+        }
+        .auto-nav-btn.active {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+        .nav-btn:hover:not(.active) {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .modal-close {
+            cursor: pointer;
+            color: #9ca3af;
+            font-size: 24px;
+            border: none;
+            background: transparent;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .modal-close:hover {
+            color: #ef4444;
+            background-color: #fee2e2;
+            transform: rotate(90deg);
+        }
+        .modal-content {
+            padding: 15px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .form-left {
+            flex: 2;
+            min-width: 280px;
+        }
+        .form-right {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-item {
+            margin-bottom: 15px;
+        }
+        .form-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        .form-item select,
+        .form-item input,
+        .form-item textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .name-input-wrap {
+            position: relative;
+        }
+        .name-input-wrap input {
+            padding-right: 28px;
+        }
+        .search-icon {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            cursor: pointer;
+        }
+        .form-item textarea {
+            resize: none;
+            min-height: 80px;
+        }
+        .form-item select:focus,
+        .form-item input:focus,
+        .form-item textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            border-width: 2px;
+        }
+        input[readonly] {
+            background-color: #f9f9f9;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .dropdown-container {
+            position: relative;
+        }
+        .dropdown-trigger {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            background: white;
+            font-size: 14px;
+        }
+        .dropdown-trigger:hover {
+            border-color: #007bff;
+        }
+        .dropdown-arrow {
+            font-size: 12px;
+            color: #666;
+        }
+        .dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            display: none;
+        }
+        .dropdown-options.show {
+            display: block;
+        }
+        .dropdown-option {
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .dropdown-option:hover {
+            background: #f5f5f5;
+        }
+        .modal-footer {
+            padding: 12px 15px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .btn-save {
+            padding: 6px 15px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-save:hover {
+            background: #0069d9;
+        }
+        .btn-cancel {
+            padding: 6px 15px;
+            background: #fff;
+            color: #666;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-cancel:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-customer-modal">
+        <div class="modal-header">
+            <div class="title-group">
+                编辑客户
+                <button class="nav-btn" id="prev-btn">◀</button>
+                <button class="nav-btn" id="next-btn">▶</button>
+                <button class="nav-btn auto-nav-btn" id="auto-next-btn">自动下一条</button>
+            </div>
+            <span class="modal-close">×</span>
+        </div>
+        <div class="modal-content">
+            <div class="form-left">
+                <div class="form-item">
+                    <label>客户级别</label>
+                    <div class="dropdown-container">
+                        <div class="dropdown-trigger" id="level-trigger">
+                            <span id="level-display">请选择客户级别</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="dropdown-options" id="level-options">
+                            <div class="dropdown-option" data-value="A">A（优质客户）</div>
+                            <div class="dropdown-option" data-value="B">B（潜力客户）</div>
+                            <div class="dropdown-option" data-value="C">C（未知客户）</div>
+                        </div>
+                        <input type="hidden" id="customer-level" name="customer-level">
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label>接通状态</label>
+                    <div class="dropdown-container">
+                        <div class="dropdown-trigger" id="status-trigger">
+                            <span id="status-display">请选择接通状态</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="dropdown-options" id="status-options">
+                            <div class="dropdown-option" data-value="已接通">已接通</div>
+                            <div class="dropdown-option" data-value="未接通">未接通</div>
+                            <div class="dropdown-option" data-value="忙线">忙线</div>
+                            <div class="dropdown-option" data-value="无人接听">无人接听</div>
+                        </div>
+                        <input type="hidden" id="connect-status" name="connect-status">
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label>客户名称</label>
+                    <div class="name-input-wrap">
+                        <input type="text" id="customer-name" placeholder="请输入客户名称">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label>电话</label>
+                    <input type="tel" id="customer-tel" placeholder="请输入电话号码" oninput="filterDigitsOnly(this);">
+                </div>
+            </div>
+            <div class="form-right">
+                <div class="form-item">
+                    <label>备注</label>
+                    <textarea id="customer-remark" rows="4" placeholder="请输入备注信息"></textarea>
+                </div>
+                <div class="form-item">
+                    <label>手机</label>
+                    <input type="tel" id="customer-phone" value="18523266916" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-save">保存</button>
+            <button class="btn-cancel">取消</button>
+        </div>
+    </div>
+    <script>
+        // 过滤数字输入
+        function filterDigitsOnly(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        let currentIndex = 0;
+        let isAutoNext = false;
+        const autoNextBtn = document.getElementById('auto-next-btn');
+        const currentUser = JSON.parse(localStorage.getItem('crm_user'));
+        
+        // 获取URL参数中的客户ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const customerId = urlParams.get('id');
+        
+        // 获取当前用户能看到的客户
+        function getVisibleCustomers() {
+            const savedCustomers = localStorage.getItem('crm_customers');
+            const customers = savedCustomers ? JSON.parse(savedCustomers) : [];
+            const roleId = currentUser.roleId;
+            
+            if (roleId === 1) {
+                // 超级管理员可以看到所有客户
+                return customers;
+            } else if (roleId === 2) {
+                // 组内管理员只能看到本组客户
+                return customers.filter(c => c.department === currentUser.department);
+            } else {
+                // 组员只能看到自己的客户
+                return customers.filter(c => c.owner === currentUser.name);
+            }
+        }
+        
+        // 如果有客户ID参数，找到对应的索引
+        const visibleCustomers = getVisibleCustomers();
+        if (customerId) {
+            const index = visibleCustomers.findIndex(c => c.id === parseInt(customerId));
+            if (index !== -1) {
+                currentIndex = index;
+            }
+        }
+        loadCustomerData();
+        document.getElementById('prev-btn').addEventListener('click', function() {
+            const visibleCustomers = getVisibleCustomers();
+            if (currentIndex === 0) {
+                // 创建页面内提示
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #ff6b6b; color: white; padding: 12px 20px; border-radius: 4px; z-index: 9999; font-size: 14px;';
+                toast.textContent = '当前已经是第一条数据，无法继续向上切换';
+                document.body.appendChild(toast);
+                // 3秒后移除提示
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 3000);
+                return;
+            }
+            currentIndex--;
+            loadCustomerData();
+        });
+        document.getElementById('next-btn').addEventListener('click', function() {
+            const visibleCustomers = getVisibleCustomers();
+            if (currentIndex === visibleCustomers.length - 1) {
+                // 创建页面内提示
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #ff6b6b; color: white; padding: 12px 20px; border-radius: 4px; z-index: 9999; font-size: 14px;';
+                toast.textContent = '当前已经是最后一条数据，无法继续向下切换';
+                document.body.appendChild(toast);
+                // 3秒后移除提示
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 3000);
+                return;
+            }
+            currentIndex++;
+            loadCustomerData();
+        });
+        autoNextBtn.addEventListener('click', function() {
+            isAutoNext = !isAutoNext;
+            this.classList.toggle('active', isAutoNext);
+            
+            if (isAutoNext) {
+                // 自动下一条逻辑
+                const autoNextInterval = setInterval(() => {
+                    const visibleCustomers = getVisibleCustomers();
+                    if (currentIndex < visibleCustomers.length - 1) {
+                        currentIndex++;
+                        loadCustomerData();
+                    } else {
+                        // 已经到达最后一条，停止自动切换
+                        isAutoNext = false;
+                        this.classList.remove('active');
+                        clearInterval(autoNextInterval);
+                    }
+                }, 3000); // 每3秒自动切换
+            }
+        });
+        function loadCustomerData() {
+            const visibleCustomers = getVisibleCustomers();
+            const customer = visibleCustomers[currentIndex];
+            
+            if (customer) {
+                document.getElementById('customer-level').value = customer.customerLevel || 'c';
+                document.getElementById('connect-status').value = customer.callStatus || 'unconnected';
+                document.getElementById('customer-name').value = customer.name || '';
+                document.getElementById('customer-tel').value = customer.phone || '';
+                document.getElementById('customer-remark').value = customer.remark || '';
+            } else {
+                // 如果没有客户数据，清空表单并显示提示
+                document.getElementById('customer-level').value = 'c';
+                document.getElementById('connect-status').value = 'unconnected';
+                document.getElementById('customer-name').value = '';
+                document.getElementById('customer-tel').value = '';
+                document.getElementById('customer-remark').value = '';
+                
+                // 创建页面内提示
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #ff6b6b; color: white; padding: 12px 20px; border-radius: 4px; z-index: 9999; font-size: 14px;';
+                toast.textContent = '没有找到您可以编辑的客户数据';
+                document.body.appendChild(toast);
+                // 3秒后移除提示
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 3000);
+            }
+        }
+        // 下拉菜单交互逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            // 客户级别下拉菜单
+            const levelTrigger = document.getElementById('level-trigger');
+            const levelOptions = document.getElementById('level-options');
+            const levelDisplay = document.getElementById('level-display');
+            const customerLevel = document.getElementById('customer-level');
+            
+            // 接通状态下拉菜单
+            const statusTrigger = document.getElementById('status-trigger');
+            const statusOptions = document.getElementById('status-options');
+            const statusDisplay = document.getElementById('status-display');
+            const connectStatus = document.getElementById('connect-status');
+            
+            // 客户级别下拉菜单交互
+            if (levelTrigger && levelOptions && levelDisplay && customerLevel) {
+                levelTrigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    levelOptions.classList.toggle('show');
+                });
+                
+                document.querySelectorAll('#level-options .dropdown-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        const value = option.getAttribute('data-value');
+                        const text = option.textContent;
+                        levelDisplay.textContent = text;
+                        customerLevel.value = value;
+                        levelOptions.classList.remove('show');
+                    });
+                });
+            }
+            
+            // 接通状态下拉菜单交互
+            if (statusTrigger && statusOptions && statusDisplay && connectStatus) {
+                statusTrigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    statusOptions.classList.toggle('show');
+                });
+                
+                document.querySelectorAll('#status-options .dropdown-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        const value = option.getAttribute('data-value');
+                        const text = option.textContent;
+                        statusDisplay.textContent = text;
+                        connectStatus.value = value;
+                        statusOptions.classList.remove('show');
+                    });
+                });
+            }
+            
+            // 点击页面其他地方关闭下拉菜单
+            document.addEventListener('click', (e) => {
+                const isLevelTrigger = e.target.closest('#level-trigger') || e.target.closest('#level-options');
+                const isStatusTrigger = e.target.closest('#status-trigger') || e.target.closest('#status-options');
+                
+                if (levelOptions && !isLevelTrigger) {
+                    levelOptions.classList.remove('show');
+                }
+                if (statusOptions && !isStatusTrigger) {
+                    statusOptions.classList.remove('show');
+                }
+            });
+        });
+        
+        document.querySelector('.btn-save').addEventListener('click', function() {
+            const level = document.getElementById('customer-level').value;
+            const status = document.getElementById('connect-status').value;
+            const name = document.getElementById('customer-name').value;
+            const tel = document.getElementById('customer-tel').value;
+            const remark = document.getElementById('customer-remark').value;
+            const phone = document.getElementById('customer-phone').value;
+            
+            // 验证手机号码必须为数字且至少11位
+            const phoneRegex = /^\d{11,}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('手机号码必须为数字且至少11位');
+                return;
+            }
+            
+            // 验证接通状态和客户级别是否有效
+            const validCallStatuses = ['已接通', '未接通', '忙线', '无人接听'];
+            const validCustomerLevels = ['A', 'B', 'C'];
+            let isValid = true;
+            
+            // 验证接通状态
+            if (status && !validCallStatuses.includes(status)) {
+                alert('接通状态无效，请重新选择');
+                document.getElementById('connect-status').value = '';
+                document.getElementById('status-display').textContent = '请选择接通状态';
+                isValid = false;
+            }
+            
+            // 验证客户级别
+            if (level && !validCustomerLevels.includes(level)) {
+                alert('客户级别无效，请重新选择');
+                document.getElementById('customer-level').value = '';
+                document.getElementById('level-display').textContent = '请选择客户级别';
+                isValid = false;
+            }
+            
+            // 如果有任何验证失败，阻止提交
+            if (!isValid) {
+                return;
+            }
+            
+            const currentData = {
+                level,
+                status,
+                name,
+                tel,
+                remark,
+                phone
+            };
+            if (isAutoNext) {
+                currentIndex++;
+                loadCustomerData();
+            }
+        });
+        document.querySelector('.btn-cancel').addEventListener('click', function() {
+            loadCustomerData();
+        });
+        document.querySelector('.modal-close').addEventListener('click', function() {
+        });
+    </script>
+</body>
+</html>

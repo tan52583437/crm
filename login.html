@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM系统 - 登录</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --danger-color: #f72585;
+            --warning-color: #ff9e00;
+            --info-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-radius: 10px;
+            --box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .login-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .login-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-form {
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            border-width: 2px;
+        }
+        
+        .btn {
+            padding: 15px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+            margin-top: 15px;
+        }
+        
+        .btn-info:hover {
+            background-color: #3a7bd9;
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .test-accounts {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .test-accounts h4 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .test-account-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .test-account-item:last-child {
+            border-bottom: none;
+        }
+        
+        .account-role {
+            font-size: 0.85rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .role-admin {
+            background-color: rgba(255, 158, 0, 0.2);
+            color: #e08c00;
+        }
+        
+        .role-member {
+            background-color: rgba(72, 149, 239, 0.2);
+            color: #2c80e0;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .notification.success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .login-card {
+                padding: 30px 25px;
+            }
+            
+            .login-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1><i class="fas fa-user-friends"></i> CRM系统</h1>
+            <p>客户关系管理系统 - 专业解决方案</p>
+        </div>
+        
+        <div class="login-card">
+            <h2 style="text-align: center; margin-bottom: 5px; color: #333;">用户登录</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">请输入您的账号和密码</p>
+            
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label class="form-label">账号</label>
+                    <input type="text" class="form-control" id="account" placeholder="请输入您的账号" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <input type="password" class="form-control" id="password" placeholder="请输入您的密码" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> 登录系统
+                </button>
+                
+                <button type="button" class="btn btn-info" id="test-login-btn">
+                    <i class="fas fa-user-circle"></i> 使用测试账户登录
+                </button>
+            </form>
+            <div class="login-footer">
+                <p>© 2023 客户关系管理系统 | 仅供演示使用</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 显示通知
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // 调用后端登录 API
+        async function apiLogin(account, password) {
+            try {
+                // 添加完整的URL路径
+                const res = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: account, password })
+                });
+
+                const data = await res.json();
+                console.log('登录API响应:', { status: res.status, data });
+                return { status: res.status, data };
+            } catch (e) {
+                console.error('调用登录接口失败', e);
+                return { status: 0, data: { ok: false, message: '无法连接到登录服务' } };
+            }
+        }
+
+        // 处理登录逻辑
+        async function handleLogin(account, password) {
+            const result = await apiLogin(account, password);
+            if (result.status === 200 && result.data && result.data.ok) {
+                // 从API获取最新的用户信息，确保部门信息正确
+                try {
+                    const userResponse = await fetch(`http://localhost:3000/api/accounts/${result.data.user.id}`);
+                    if (userResponse.ok) {
+                        const result = await userResponse.json();
+                        // 保存用户信息到 localStorage（不包含密码）
+                        localStorage.setItem('crm_user', JSON.stringify(result.account));
+                    } else {
+                        // 如果获取失败，使用登录接口返回的用户信息
+                        localStorage.setItem('crm_user', JSON.stringify(result.data.user));
+                    }
+                } catch (e) {
+                    console.error('获取用户信息失败:', e);
+                    // 如果获取失败，使用登录接口返回的用户信息
+                    localStorage.setItem('crm_user', JSON.stringify(result.data.user));
+                }
+                showNotification('登录成功，正在跳转...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 800);
+            } else if (result.status === 401) {
+                showNotification(result.data.message || '账号或密码错误', 'error');
+            } else if (result.status === 403) {
+                showNotification(result.data.message || '此账户已禁用，请联系管理员开通。', 'error');
+            } else {
+                showNotification(result.data.message || '登录失败，请稍后重试', 'error');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 表单提交
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const account = document.getElementById('account').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                if (!account || !password) {
+                    showNotification('请输入账号和密码', 'error');
+                    return;
+                }
+
+                handleLogin(account, password);
+            });
+
+            // 测试账户登录按钮（快速填充超级管理员账号）
+            document.getElementById('test-login-btn').addEventListener('click', function() {
+                document.getElementById('account').value = '10000';
+                document.getElementById('password').value = '123456';
+                showNotification('已填充超级管理员账号（10000）', 'success');
+            });
+
+            // 如果 localStorage 中已有 crm_user，则直接跳转（不再本地校验密码）
+            const savedUser = localStorage.getItem('crm_user');
+            if (savedUser) {
+                showNotification('检测到已登录用户，正在跳转...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 800);
+            }
+        });
+    </script>
+</body>
+</html>

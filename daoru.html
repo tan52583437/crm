@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导入客户弹窗</title>
+    <style>
+        /* 全局重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        /* 遮罩层通用样式 */
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            /* 默认隐藏 */
+            display: none;
+        }
+
+        /* 主弹窗容器 */
+        .modal-container {
+            width: 680px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* 字段选择弹窗容器 */
+        .field-modal-container {
+            width: 480px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* 弹窗标题栏通用 */
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            color: #9ca3af;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            background: transparent;
+            border: none;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background-color: #fee2e2;
+            color: #ef4444;
+            transform: rotate(90deg);
+        }
+
+        /* 步骤进度条 */
+        .step-bar {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .step-item {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-item::after {
+            content: "";
+            position: absolute;
+            top: 8px;
+            right: -28px;
+            width: 20px;
+            height: 1px;
+            background: #eee;
+        }
+
+        .step-item:last-child::after {
+            display: none;
+        }
+
+        .step-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* 步骤高亮样式 */
+        .step-item.active .step-text {
+            color: #1890ff;
+            font-weight: 600;
+        }
+
+        .step-item.active::before {
+            content: "";
+            position: absolute;
+            bottom: -21px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: #1890ff;
+        }
+
+        /* 弹窗内容区通用 */
+        .modal-content {
+            padding: 24px 20px;
+        }
+
+        .content-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .tips-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .link-text {
+            color: #1890ff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .link-text:hover {
+            text-decoration: underline;
+        }
+
+        /* 下拉选择框/输入框样式 */
+        .select-input, .file-input {
+            width: 220px;
+            height: 42px;
+            padding: 0 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .select-input:focus, .file-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            border-width: 2px;
+        }
+
+        /* 文件选择区域 */
+        .file-select-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-btn {
+            padding: 0 16px;
+            height: 36px;
+            background: #f5f5f5;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-btn:hover {
+            background: #e8e8e8;
+            border-color: #c6c6c6;
+        }
+
+        /* 弹窗底部操作栏通用 */
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 按钮通用样式 */
+        .btn {
+            padding: 0 20px;
+            height: 36px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+
+        .btn-default {
+            background: #f5f5f5;
+            color: #666;
+            margin-left: 12px;
+        }
+
+        .btn-default:hover {
+            background: #e8e8e8;
+        }
+
+        /* 字段选择列表样式 */
+        .field-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .field-item {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .field-item:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .field-item.active {
+            background: #e6f7ff;
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        /* 已选择字段高亮 */
+        .selected-fields {
+            color: #1890ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主弹窗（导入客户） -->
+    <div class="modal-mask" id="mainModal" style="display: flex;">
+        <div class="modal-container">
+            <!-- 标题栏 -->
+            <div class="modal-header">
+                <div class="modal-title">导入客户</div>
+                <div class="close-btn" onclick="closeMainModal()">×</div>
+            </div>
+
+            <!-- 步骤条 -->
+            <div class="step-bar">
+                <div class="step-item active">
+                    <div class="step-text">上传文件</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">导入数据</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">导入完成</div>
+                </div>
+            </div>
+
+            <!-- 内容区 -->
+            <div class="modal-content">
+                <!-- 模板准备板块 -->
+                <div class="content-section">
+                    <div class="section-title">一、请按照数据模板的格式准备要导入的数据。</div>
+                    <div class="tips-text">
+                        <a class="link-text" href="javascript:;">点击下载《客户导入模板》</a>
+                    </div>
+                    <div class="tips-text">导入文件请不超过2MB（约10,000条数据）</div>
+                </div>
+
+                <!-- 重复数据处理板块 -->
+                <div class="content-section">
+                    <div class="section-title">二、请选择数据重复时的处理方式，已选择字段：<span class="selected-fields" id="selectedFieldsText"></span></div>
+                    <div class="tips-text">
+                        查重规则：添加客户时所需填写的所有唯一字段，
+                        <a class="link-text" id="setFieldBtn" onclick="openFieldModal()">设置字段</a>
+                        
+                    </div>
+                    <select class="select-input">
+                        <option value="skip">跳过</option>
+                        <option value="cover">覆盖原有数据</option>
+                        <option value="ignore">更新原有数据</option>
+                    </select>
+                </div>
+
+                <!-- 文件选择板块 -->
+                <div class="content-section">
+                    <div class="section-title">三、请选择需要导入的文件</div>
+                    <div class="file-select-area">
+                        <input type="text" class="file-input" placeholder="未选择文件" readonly>
+                        <button class="file-btn">选择文件</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部操作栏 -->
+            <div class="modal-footer">
+                <a class="link-text" href="javascript:;">查看历史导入记录</a>
+                <div>
+                    <button class="btn btn-primary">立即导入</button>
+                    <button class="btn btn-default" onclick="closeMainModal()">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 字段选择弹窗 -->
+    <div class="modal-mask" id="fieldModal">
+        <div class="field-modal-container">
+            <!-- 标题栏 -->
+            <div class="modal-header">
+                <div class="modal-title">选择唯一字段</div>
+                <div class="close-btn" onclick="closeFieldModal()">×</div>
+            </div>
+
+            <!-- 内容区 -->
+            <div class="modal-content">
+                <div class="section-title">请选择作为查重依据的唯一字段（可多选）：</div>
+                <div class="field-list" id="fieldList">
+                    <div class="field-item" onclick="toggleField('客户名称')">客户名称</div>
+                    <div class="field-item" onclick="toggleField('接通状态')">接通状态</div>
+                    <div class="field-item" onclick="toggleField('手机')">手机</div>
+                    <div class="field-item" onclick="toggleField('客户级别')">客户级别</div>
+                    <div class="field-item" onclick="toggleField('备注')">备注</div>
+                    <div class="field-item" onclick="toggleField('负责人')">负责人</div>
+                    <div class="field-item" onclick="toggleField('所属部门')">所属部门</div>
+                </div>
+            </div>
+
+            <!-- 底部操作栏 -->
+            <div class="modal-footer">
+                <div style="flex: 1;"></div>
+                <div>
+                    <button class="btn btn-primary" onclick="confirmFieldSelection()">确认选择</button>
+                    <button class="btn btn-default" onclick="closeFieldModal()">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局CRM应用对象
+        window.crmApp = {
+            openFieldModal: function(fieldType) {
+                openFieldModal();
+            }
+        };
+
+        // 已选择的字段列表
+        let selectedFields = [];
+
+        // 页面加载完成后初始化字段设置并打开主弹窗
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFieldSettings();
+            openMainModal();
+        });
+
+        // 加载字段设置
+        function loadFieldSettings() {
+            fetch('http://localhost:3000/api/field-settings')
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    selectedFields = data.settings.uniqueFields || [];
+                    // 更新UI显示
+                    const selectedFieldsText = document.getElementById('selectedFieldsText');
+                    if (selectedFields.length === 0) {
+                        selectedFieldsText.textContent = '**';
+                    } else {
+                        selectedFieldsText.textContent = selectedFields.join('、');
+                    }
+                    // 更新字段选中状态
+                    document.querySelectorAll('.field-item').forEach(item => {
+                        const fieldName = item.textContent;
+                        if (selectedFields.includes(fieldName)) {
+                            item.classList.add('active');
+                        }
+                    });
+                } else {
+                    console.error('加载字段设置失败:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('加载字段设置时出错:', error);
+            });
+        }
+
+        // 打开主弹窗（默认显示，可根据需求调整）
+        function openMainModal() {
+            document.getElementById('mainModal').style.display = 'flex';
+        }
+
+        // 关闭主弹窗
+        function closeMainModal() {
+            document.getElementById('mainModal').style.display = 'none';
+        }
+
+        // 打开字段选择弹窗
+        function openFieldModal() {
+            const fieldModal = document.getElementById('fieldModal');
+            if (fieldModal) {
+                fieldModal.style.display = 'flex';
+            } else {
+                console.error('无法找到字段选择弹窗');
+            }
+            // 重置字段选中状态（可选：保留上次选择则注释）
+            // resetFieldSelection();
+        }
+
+        // 关闭字段选择弹窗
+        function closeFieldModal() {
+            document.getElementById('fieldModal').style.display = 'none';
+        }
+
+        // 切换字段选中状态
+        function toggleField(fieldName) {
+            const fieldItem = Array.from(document.getElementById('fieldList').children).find(item => item.textContent === fieldName);
+            if (selectedFields.includes(fieldName)) {
+                // 取消选中
+                selectedFields = selectedFields.filter(item => item !== fieldName);
+                fieldItem.classList.remove('active');
+            } else {
+                // 选中
+                selectedFields.push(fieldName);
+                fieldItem.classList.add('active');
+            }
+        }
+
+        // 重置字段选择
+        function resetFieldSelection() {
+            selectedFields = [];
+            document.querySelectorAll('.field-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.getElementById('selectedFieldsText').textContent = '**';
+        }
+
+        // 确认字段选择并更新显示
+        function confirmFieldSelection() {
+            const selectedFieldsText = document.getElementById('selectedFieldsText');
+            const currentSelected = [...selectedFields]; // 保存当前选择
+            // 保存字段设置到API
+            fetch('http://localhost:3000/api/field-settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ uniqueFields: selectedFields })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    console.log('字段设置保存成功');
+                    // 只有保存成功才更新UI
+                    if (currentSelected.length === 0) {
+                        selectedFieldsText.textContent = '**';
+                    } else {
+                        selectedFieldsText.textContent = currentSelected.join('、');
+                    }
+                    closeFieldModal();
+                } else {
+                    console.error('字段设置保存失败:', data.message);
+                    // 保存失败时恢复字段选择
+                    selectedFields = currentSelected;
+                    // 恢复UI状态
+                    document.querySelectorAll('.field-item').forEach(item => {
+                        const fieldName = item.textContent;
+                        if (selectedFields.includes(fieldName)) {
+                            item.classList.add('active');
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('保存字段设置时出错:', error);
+                // 出错时恢复字段选择
+                selectedFields = currentSelected;
+                // 恢复UI状态
+                document.querySelectorAll('.field-item').forEach(item => {
+                    const fieldName = item.textContent;
+                    if (selectedFields.includes(fieldName)) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

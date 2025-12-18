@@ -1,0 +1,76 @@
+{
+  "callStatus": [
+    {
+      "name": "接通",
+      "value": "接通"
+    },
+    {
+      "name": "未接",
+      "value": "未接"
+    },
+    {
+      "name": "拒接",
+      "value": "拒接"
+    },
+    {
+      "name": "空号",
+      "value": "空号"
+    }
+  ],
+  "department": [
+    {
+      "name": "销售一部",
+      "value": "销售一部"
+    },
+    {
+      "name": "销售二部",
+      "value": "销售二部"
+    },
+    {
+      "name": "销售三部",
+      "value": "销售三部"
+    }
+  ],
+  "position": [
+    {
+      "name": "销售",
+      "value": "销售"
+    }
+  ],
+  "customerLevel": [
+    {
+      "name": "A（意向客户）",
+      "value": "A（意向客户）"
+    },
+    {
+      "name": "B（潜在客户）",
+      "value": "B（潜在客户）"
+    },
+    {
+      "name": "C（未知客户）",
+      "value": "C（未知客户）"
+    },
+    {
+      "name": "D（无意向）",
+      "value": "D（无意向）"
+    },
+    {
+      "name": "黑名单",
+      "value": "黑名单"
+    },
+    {
+      "name": "E类客户（失联客户）",
+      "value": "E类客户（失联客户）"
+    }
+  ],
+  "testField": [
+    {
+      "name": "选项1",
+      "value": "value1"
+    },
+    {
+      "name": "选项2",
+      "value": "value2"
+    }
+  ]
+}
