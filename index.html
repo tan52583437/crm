@@ -7407,8 +7407,35 @@ document.getElementById('save-edit-account-btn')?.addEventListener('click', () =
                     // 超级管理员可以选择所有账号（除了自己）
                     targetAccounts = this.accounts.filter(a => a.id !== this.currentUser.id);
                 } else if (this.currentUser.roleId === 2) {
-                    // 组内管理员只能选择对应组内员工
-                    targetAccounts = this.accounts.filter(a => a.department === this.currentUser.department && a.id !== this.currentUser.id);
+                    // 组内管理员只能选择对应负责的员工
+                    try {
+                        const savedGroupLeaders = localStorage.getItem('crm_group_leaders');
+                        if (savedGroupLeaders) {
+                            const groupLeadersData = JSON.parse(savedGroupLeaders);
+                            // 查找当前组长负责的员工ID
+                            let responsibleMemberIds = [];
+                            groupLeadersData.forEach(group => {
+                                if (group.leaderIds && group.leaderIds.includes(this.currentUser.id)) {
+                                    responsibleMemberIds = [...responsibleMemberIds, ...(group.memberIds || [])];
+                                }
+                            });
+                            // 筛选出负责的员工
+                            targetAccounts = this.accounts.filter(a => 
+                                responsibleMemberIds.includes(a.id) && a.id !== this.currentUser.id
+                            );
+                        } else {
+                            // 如果没有组长数据，默认显示同部门员工
+                            targetAccounts = this.accounts.filter(a => 
+                                a.department === this.currentUser.department && a.id !== this.currentUser.id
+                            );
+                        }
+                    } catch (e) {
+                        console.error('解析组长数据失败:', e);
+                        // 出错时默认显示同部门员工
+                        targetAccounts = this.accounts.filter(a => 
+                            a.department === this.currentUser.department && a.id !== this.currentUser.id
+                        );
+                    }
                 }
                 
                 // 添加选项
