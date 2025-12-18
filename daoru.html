@@ -414,7 +414,7 @@
 
         // 加载字段设置
         function loadFieldSettings() {
-            fetch('http://localhost:3000/api/field-settings')
+            fetch('/api/field-settings')
             .then(response => response.json())
             .then(data => {
                 if (data.ok) {
@@ -497,7 +497,7 @@
             const selectedFieldsText = document.getElementById('selectedFieldsText');
             const currentSelected = [...selectedFields]; // 保存当前选择
             // 保存字段设置到API
-            fetch('http://localhost:3000/api/field-settings', {
+            fetch('/api/field-settings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
