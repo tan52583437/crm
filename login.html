@@ -292,8 +292,8 @@
         // 调用后端登录 API
         async function apiLogin(account, password) {
             try {
-                // 添加完整的URL路径
-                const res = await fetch('http://localhost:3000/api/login', {
+                // 使用相对路径，自动适配当前域名
+                const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -315,8 +315,8 @@
             const result = await apiLogin(account, password);
             if (result.status === 200 && result.data && result.data.ok) {
                 // 从API获取最新的用户信息，确保部门信息正确
-                try {
-                    const userResponse = await fetch(`http://localhost:3000/api/accounts/${result.data.user.id}`);
+                    try {
+                        const userResponse = await fetch(`/api/accounts/${result.data.user.id}`);
                     if (userResponse.ok) {
                         const result = await userResponse.json();
                         // 保存用户信息到 localStorage（不包含密码）
