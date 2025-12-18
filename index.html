@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -4124,7 +4124,7 @@ getUniqueDepartmentsFromAccounts: function() {
                         // 如果用户没有部门信息，则尝试从API获取并设置
                         if (!this.currentUser.department) {
                             try {
-                                const response = await fetch(`http://localhost:3000/api/accounts/${this.currentUser.id}`);
+                                const response = await fetch(`/api/accounts/${this.currentUser.id}`);
                                 if (response.ok) {
                                     const result = await response.json();
                                     if (result.ok && result.account) {
@@ -4808,7 +4808,7 @@ deleteGroupLeader: function(leaderIndex) {
                 
                 // 如果本地数据不存在或解析失败，再从API加载
                 try {
-                    const response = await fetch('http://localhost:3000/api/accounts');
+                    const response = await fetch('/api/accounts');
                     const data = await response.json();
                     if (Array.isArray(data)) {
                         this.accounts = data;
@@ -5050,7 +5050,7 @@ deleteGroupLeader: function(leaderIndex) {
             // 创建账户（通过API）
             createAccount: async function(accountData) {
                 try {
-                    const response = await fetch('http://localhost:3000/api/accounts', {
+                    const response = await fetch('/api/accounts', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -5086,7 +5086,7 @@ deleteGroupLeader: function(leaderIndex) {
                         currentUsername
                     };
                     
-                    const response = await fetch(`http://localhost:3000/api/accounts/${accountId}`, {
+                    const response = await fetch(`/api/accounts/${accountId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -5121,7 +5121,7 @@ deleteGroupLeader: function(leaderIndex) {
                     
                     console.log('发送删除账户请求:', { accountId, currentUsername });
                     
-                    const response = await fetch(`http://localhost:3000/api/accounts/${accountId}`, {
+                    const response = await fetch(`/api/accounts/${accountId}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
@@ -10668,7 +10668,7 @@ getUniqueOwners: function() {
             crmApp.currentEditingField = fieldName;
             
             // 从服务器获取字段选项
-            fetch('http://localhost:3000/api/field-options')
+            fetch('/api/field-options')
             .then(response => response.json())
             .then(data => {
                 if (data.ok && data.options[fieldName]) {
@@ -10721,7 +10721,7 @@ getUniqueOwners: function() {
             const apiFieldName = fieldNameMap[fieldName] || fieldName;
             
             // 从服务器获取字段选项
-            fetch('http://localhost:3000/api/field-options')
+            fetch('/api/field-options')
             .then(response => response.json())
             .then(data => {
                 if (data.ok && data.options[apiFieldName]) {
@@ -10813,7 +10813,7 @@ getUniqueOwners: function() {
         
         // 加载字段选项
         crmApp.loadFieldOptions = function() {
-            fetch('http://localhost:3000/api/field-options')
+            fetch('/api/field-options')
             .then(response => response.json())
             .then(data => {
                 if (data.ok) {
@@ -10871,7 +10871,7 @@ getUniqueOwners: function() {
             // 保存到后端
             console.log('保存字段选项:', fieldName, options);
             
-            fetch('http://localhost:3000/api/field-options', {
+            fetch('/api/field-options', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
